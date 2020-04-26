@@ -24,9 +24,9 @@ def help_cb(bot, event):
     bot.send_text(chat_id=event.data['chat']['chatId'])
 
 def breakfast(bot, event):
-    breakfasts = [d for d in data if 'завтрак' in d['tags']]
-    b = breakfasts[int(round(time.time() * 1000)) % len(breakfasts)]
-    bot.send_text(chat_id=event.data['chat']['chatId'], text=FormatRecipe(b))
+    breakfasts = [d for d in data if 'завтрак' in d['tags']] # выбираем из всех записей те которые имеют тэг завтрак
+    b = breakfasts[int(round(time.time() * 1000)) % len(breakfasts)] # берем случайную запись на основе текущего времени
+    bot.send_text(chat_id=event.data['chat']['chatId'], text=FormatRecipe(b)) # отправляем этот рецепт
 
 def UploadData(filename, n=None):
     global data
