@@ -1,14 +1,13 @@
-from scrapper import Scrapper
+from src.scrappers.scrapper import Scrapper
 from bs4 import BeautifulSoup
 import requests as r
 import json
-
-recipeCount = 0
-allRecipies = []
+import time
 
 class ScrapperEdimDoma(Scrapper):
   
   base_url = 'https://www.edimdoma.ru'
+  recieps_count = 0
   
   def __init__(self) -> None:
     super().__init__()
@@ -16,8 +15,9 @@ class ScrapperEdimDoma(Scrapper):
   def scrap(self, base_word, with_ingredient=None, without_ingredient=None) -> list:
     return self.__find_recipes(base_word)
   
-  def __find_recipes(self, base_word, num_recipes=100, num_pages=10) -> list:
+  def __find_recipes(self, base_word, num_recipes=20, num_pages=10) -> list:
     recieps_count = 0
+    recipes_all = []
     for i in range(num_pages):
       try:
         # https://www.edimdoma.ru/retsepty?direction=&field=&page=2&query=%D0%B7%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA&user_ids=&with_ingredient=&with_ingredient_condition=and&without_ingredient=
@@ -31,14 +31,18 @@ class ScrapperEdimDoma(Scrapper):
         recipes = soup.find_all('article')
         recipes = [i.contents[0].attrs['href'] for i in recipes if i.attrs.get('data-id')]
         recipes = [ self.__parse_reciep(u) for u in recipes]
+        recipes_all.extend(recipes)
 
+        if self.recieps_count >= num_recipes:
+          break
         # print('Saving...')
         # with open(f'data/data_{i}.json', 'w') as f:
         #   f.write(json.dumps(recipes))
 
-        # allRecipies.extend(recipes)
+        time.sleep(self.timeout_sec)
       except Exception as ex:
         print(ex.args)
+    return recipes_all
 
   def __parse_reciep(self, url) -> dict:
     try:
@@ -54,12 +58,12 @@ class ScrapperEdimDoma(Scrapper):
       name = soup.find('h1', {"class": "recipe-header__name"}).contents[0]
       res["name"] = name
       
-      print(f'#{recipeCount}: Creating ingredients...')
+      print(f'#{self.recieps_count}: Creating ingredients...')
       ingredients = soup.find_all(self.__is_tag_ingredient_title)
       ingredients = [f"{i.attrs['data-intredient-title']}{self.space}{i.attrs['data-unit-id'] + i.attrs['data-unit-title']}" for i in ingredients]
       res["ingredients"] = self.newline.join(ingredients)
       
-      print(f'#{recipeCount}: Creating steps...')
+      print(f'#{self.recieps_count}: Creating steps...')
       steps = soup.find_all('div', {"data-module":"step_hint"})
       steps = [s.next for s in steps]
       
@@ -67,7 +71,7 @@ class ScrapperEdimDoma(Scrapper):
       # print(f'#{recipeCount}: Creating tags...')
       # tags = soup.find_all(IsTagElem)
       # tags = [t.string for t in tags]
-
+      self.recieps_count += 1
       return res
     except Exception as ex:
       print(ex.args)
