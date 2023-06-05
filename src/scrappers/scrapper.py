@@ -1,5 +1,4 @@
 
-
 class Scrapper():
     
     timeout_sec:float = 0.5
@@ -23,5 +22,5 @@ class Scrapper():
     def __init__(self) -> None:
         pass
     
-    def scrap(self) -> dict:
+    def scrap(self, base_word: str, with_ingredient: str=None, without_ingredient: str=None) -> list:
         pass

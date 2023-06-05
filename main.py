@@ -1,11 +1,12 @@
-from src.scrappers.edimdoma import ScrapperEdimDoma
+from src.shef import Shef
 
 def main():
   print("Starting...")
-  scrapper_edimdoma = ScrapperEdimDoma()
   
-  res = scrapper_edimdoma.scrap("завтрак")
-  
+  s = Shef()
+  s.connect()
+  number, err_number = s.scrap()
+  print(f'Recieps found {err_number + number}, added {number}({(number/(err_number + number)*100):.2f}%) recieps')
   print("Done")
 
 if __name__ == "__main__":
