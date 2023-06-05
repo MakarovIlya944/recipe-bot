@@ -6,7 +6,30 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("start running")
+    await update.message.reply_text("""Ты можешь управлять мной используя следующие команды:
+
+/help – основные команды бота
+
+/certainrecipe *название рецепта* – конкретный рецепт
+
+/ingredients *название* – укажите ингредиенты из которых хотите приготовить блюдо
+
+Идеи для готовки:
+/breakfast – завтрак
+/lunch – обед
+/supper – ужин
+/snacks – закуски 
+/salad – салаты
+/soup – супы
+/hotmeal – горячее 
+/dessert – десерт
+/baking – выпечка
+/drinks – напитки 
+/nationalkitchen *название кухни* – национальная кухня
+/vegetarian – вегетарианская кухня
+
+Итак, что готовим? """)
+    
 
 async def zavtrak(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print("get_reciep running")
@@ -38,11 +61,14 @@ async def vipechka(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def napitki(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print("get_reciep running")
 
+async def next(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("get_reciep running")
+
 def main():
     print("привет")
     application = Application.builder().token("").build()
     application.add_handler(CommandHandler(["start", "help"], start))
-    application.add_handler(CommandHandler("next"))
+    application.add_handler(CommandHandler("next",next))
     application.add_handler(CommandHandler("zavtrak",zavtrak))
     application.add_handler(CommandHandler("obed",obed))
     application.add_handler(CommandHandler("yjin",yjin))
