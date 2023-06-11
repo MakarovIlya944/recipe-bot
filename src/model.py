@@ -90,3 +90,15 @@ class BotDatabase():
             return tmp.random(1)
         return select(p for p in BotDatabase.Reciep if p.baseword == baseword).random(1)
         
+    @db_session   
+    def parse_recipe(self, recipe):
+        ingredients = select((i.name, im.measuretitile, im.measurenumber) for im in recipe.ingredients for i in BotDatabase.Ingredient if im.ingredient == i)
+        ingredients = [_c for _c in ingredients]
+        return {
+            "name":recipe.name,
+            "desc":recipe.desc,
+            "ingredients":ingredients,
+            "steps":recipe.steps.split('\n'),
+            "baseword":recipe.baseword
+        }
+        
