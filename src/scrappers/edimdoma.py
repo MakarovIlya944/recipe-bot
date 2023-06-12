@@ -8,14 +8,16 @@ class ScrapperEdimDoma(Scrapper):
   
   base_url = 'https://www.edimdoma.ru'
   recieps_count = 0
+  num_recipes=20
+  num_pages=10
   
   def __init__(self) -> None:
     super().__init__()
     
   def scrap(self, base_word, with_ingredient=None, without_ingredient=None) -> list:
-    return self.__find_recipes(self, base_word)
+    return self.__find_recipes(self, base_word, num_recipes=self.num_pages, num_pages=self.num_pages)
   
-  def __find_recipes(self, base_word, num_recipes=20, num_pages=10) -> list:
+  def __find_recipes(self, base_word, num_recipes, num_pages) -> list:
     self.recieps_count = 0
     recipes_all = []
     for i in range(num_pages):
@@ -50,32 +52,36 @@ class ScrapperEdimDoma(Scrapper):
 
   def __parse_reciep(self, url) -> dict:
     try:
+      step="name"
       resp = r.get(self.base_url + url)
       soup = BeautifulSoup(resp.text, 'lxml')
       
       res = {}
       
+      # print(f'#{self.recieps_count}: Creating name...')
+      name = soup.find('h1', {"class": "recipe-header__name"}).contents[0]
+      res["name"] = name
+      
+      step="description"
       # print(f'#{self.recieps_count}: Creating desc...')
       description = soup.find('div', {"class": "recipe_description"})
       # description = description.contents[0].contents[0] if description else ""
       try:
         description = description.text
       except Exception as ex:
-        print(f'Description parse error, recipe #{self.recieps_count}: {str(ex.args)}')
+        raise IndexError(f'Description parse error: {str(ex.args)}') from ex
       if not type(description) is str:
         description = ""
       res["desc"] = description
       
-      # print(f'#{self.recieps_count}: Creating name...')
-      name = soup.find('h1', {"class": "recipe-header__name"}).contents[0]
-      res["name"] = name
-      
+      step="ingredients"
       # print(f'#{self.recieps_count}: Creating ingredients...')
       ingredients = soup.find_all(self.__is_tag_ingredient_title)
-      res["ingredients"] = [(i.attrs['data-intredient-title'],
-                      i.attrs['data-unit-id'] if i.attrs['data-unit-id'] else "0",
-                      i.attrs['data-unit-title'] if i.attrs['data-unit-id'] else " ") 
-                    for i in ingredients]
+      res["ingredients"] = [(i.contents[0].contents[0].contents[1].contents[1].contents[0].text, 
+                      i.contents[0].contents[0].contents[1].contents[0].attrs['data-amount'], 
+                      i.contents[0].contents[0].contents[1].contents[0].attrs['data-unit-title']) for i in ingredients]
+      
+      step="steps"
       
       # print(f'#{self.recieps_count}: Creating steps...')
       steps = soup.find_all('div', {"data-module":"step_hint"})
@@ -88,11 +94,10 @@ class ScrapperEdimDoma(Scrapper):
       self.recieps_count += 1
       return res
     except Exception as ex:
-      print(ex.args)
-      raise ex
+      print(f'{name}: problem with {step} {str(ex.args)}')
 
   def __is_tag_ingredient_title(tag):
-    return tag.attrs.get('class') and 'checkbox__input' in tag.attrs.get('class') and 'recipe_ingredient_checkbox' in tag.attrs.get('class')
+    return tag.attrs.get('class') and 'definition-list-table__tr' in tag.attrs.get('class') and not ('nutritional-value__nutritional-list' in tag.parent.parent.attrs.get('class'))
 
 if __name__ == '__main__':
   # FindRecipes(1000)
