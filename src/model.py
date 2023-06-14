@@ -20,7 +20,7 @@ class BotDatabase():
         imeasuredid = PrimaryKey(int, auto=True)
         ingredient = Required('Ingredient')
         measuretitile = Required(str)
-        measurenumber = Required(int)
+        measurenumber = Required(float)
         recipes = Set('Reciep')
         
     def __init__(self, provider='sqlite', user='', password='', host='', database='recipes') -> None:
@@ -35,7 +35,7 @@ class BotDatabase():
         try:
             e = get(ing for ing in BotDatabase.Ingredient if ing.name == name)
         except Exception as ex:
-            print(ex.args)
+            raise ex
         if e is None:
             return BotDatabase.Ingredient(name=name)
         return e
@@ -45,6 +45,7 @@ class BotDatabase():
             title = " "
         if not number:
             number = 0
+        number = float(number)
         try:
             e = get(ing for ing in BotDatabase.IngredientMeasured if ing.ingredient == ingredient and ing.measuretitile == title and ing.measurenumber == number)
         except Exception as ex:
@@ -58,7 +59,7 @@ class BotDatabase():
         return e
         
     @db_session
-    def add_recieps(self, recieps:list):
+    def add_recieps(self, recieps:list) -> tuple:
         count = 0
         err_count = 0
         for reciep in recieps:
@@ -79,7 +80,7 @@ class BotDatabase():
             except Exception as ex:
                 print(f'{str(reciep)}: {ex.args}')
                 err_count += 1
-        return count, err_count
+        return (count, err_count)
     
     @db_session    
     def get_recipe(self, baseword: str, with_ingredient: str=None, without_ingredient: str=None, limit: int=20)-> tuple:
@@ -98,7 +99,7 @@ class BotDatabase():
             "name":recipe.name,
             "desc":recipe.desc,
             "ingredients":ingredients,
-            "steps":recipe.steps.split('\n'),
+            "steps":recipe.steps,
             "baseword":recipe.baseword
         }
         

@@ -32,7 +32,8 @@ class ScrapperEdimDoma(Scrapper):
 
         recipes = soup.find_all('article')
         recipes = [i.contents[0].attrs['href'] for i in recipes if i.attrs.get('data-id')]
-        recipes = [ self.__parse_reciep(self, u) for u in recipes]
+        recipes = [self.__parse_reciep(self, u) for u in recipes]
+        recipes = [r for r in recipes if r]
         for rec in recipes:
           rec['baseword'] = base_word
         recipes_all.extend(recipes)

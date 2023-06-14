@@ -6,7 +6,7 @@ class Shef():
   
   scrapper:Scrapper = ScrapperEdimDoma
   db:BotDatabase = None
-  lastConfig:list[str] = []
+  lastConfig:list[str] = [0,0,0]
   
   def __init__(self, scrapper="EdimDoma") -> None:
     super().__init__()
@@ -16,7 +16,7 @@ class Shef():
   def connect(provider='sqlite', user='', password='', host='', database='recipes') -> None:
     Shef.db = BotDatabase(provider)
   
-  def scrap(**kwargs) -> int:
+  def scrap(**kwargs) -> tuple:
     count = 0
     err_count = 0
     if kwargs.get('num_pages'):
@@ -28,7 +28,7 @@ class Shef():
       res = Shef.db.add_recieps(Shef.scrapper.scrap(Shef.scrapper, word))
       count += res[0]
       err_count += res[1]
-    return count, err_count
+    return (count, err_count)
       
   def save(self) -> None:
     pass

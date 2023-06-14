@@ -1,5 +1,5 @@
 
-
+from src.shef import Shef
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
@@ -17,7 +17,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 Идеи для готовки:
 /breakfast – завтрак
 /lunch – обед
-/supper – ужин
+/saladper – ужин
 /snacks – закуски 
 /salad – салаты
 /soup – супы
@@ -30,58 +30,104 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 Итак, что готовим? """)
     
+def generate_html(reciep) -> str:
+    ings = []
+    for i in reciep['ingredients']:
+        m = i[2]
+        if abs(int(i[2]) - i[2]) < 1e-3:
+            m = int(i[2])
+        ings.append(f'{i[0]}:\t\t{m} {i[1]}')
+    ings = '\n'.join(ings)
+    steps = reciep['steps'].split('\n')
+    steps = [f'<b>{i+1}.</b> {v}' for i,v in enumerate(steps)]
+    steps = '\n'.join(steps)
+    
+    return f"""
+<b>{reciep['name']}</b>
 
-async def zavtrak(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
 
-async def obed(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+<b>Описание:</b>
+{reciep['desc']}
 
-async def yjin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
 
-async def zakyska(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+<b>Игредиенты:</b>
+{ings}
 
-async def sup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
 
-async def goryachee(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+<b>Приготовление:</b>
+{steps}
+                                    """
 
-async def salat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+async def breakfast(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("завтрак")
+    await update.message.reply_html(generate_html(Shef.get("завтрак")))
 
-async def desert(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+async def lunch(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("обед")
+    await update.message.reply_html(generate_html(Shef.get("обед")))
 
-async def vipechka(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+async def supper(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("ужин")
+    await update.message.reply_html(generate_html(Shef.get("ужин")))
 
-async def napitki(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+async def salad(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("салат")
+    await update.message.reply_html(generate_html(Shef.get("салат")))
+
+async def snacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("закуска")
+    await update.message.reply_html(generate_html(Shef.get("закуска")))
+
+async def soup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("суп")
+    await update.message.reply_html(generate_html(Shef.get("суп")))
+
+async def hotmeal(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("горячее")
+    await update.message.reply_html(generate_html(Shef.get("горячее")))
+
+async def dessert(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("десерт")
+    await update.message.reply_html(generate_html(Shef.get("десерт")))
+
+async def baking(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("выпечка")
+    await update.message.reply_html(generate_html(Shef.get("выпечка")))
+
+async def drinks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("напитки")
+    await update.message.reply_html(generate_html(Shef.get("напитки")))
+    
+# async def vegetarian(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+#     print("завтрак")
+#     await update.message.reply_html(generate_html("завтрак"))
 
 async def next(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("get_reciep running")
+    print("next")
+    Shef.next()
+    await update.message.reply_html(generate_html(Shef.next()))
 
 def main():
     print("привет")
     application = Application.builder().token("").build()
     application.add_handler(CommandHandler(["start", "help"], start))
     application.add_handler(CommandHandler("next",next))
-    application.add_handler(CommandHandler("zavtrak",zavtrak))
-    application.add_handler(CommandHandler("obed",obed))
-    application.add_handler(CommandHandler("yjin",yjin))
-    application.add_handler(CommandHandler("zakyska",zakyska))
-    application.add_handler(CommandHandler("salat",salat))
-    application.add_handler(CommandHandler("sup",sup))
-    application.add_handler(CommandHandler("goryachee",goryachee))
-    application.add_handler(CommandHandler("desert",desert))
-    application.add_handler(CommandHandler("vipechka",vipechka))
-    application.add_handler(CommandHandler("napitki",napitki))
-
-
+    application.add_handler(CommandHandler("breakfast",breakfast))
+    application.add_handler(CommandHandler("lunch",lunch))
+    application.add_handler(CommandHandler("salad",salad))
+    application.add_handler(CommandHandler("snacks",snacks))
+    application.add_handler(CommandHandler("hotmeal",hotmeal))
+    application.add_handler(CommandHandler("salad",salad))
+    application.add_handler(CommandHandler("soup",soup))
+    application.add_handler(CommandHandler("dessert",dessert))
+    application.add_handler(CommandHandler("baking",baking))
+    application.add_handler(CommandHandler("drinks",drinks))
+    
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 """разбить хэндлеры на отдельные, описать старт  хелп некст"""
 if __name__ =="__main__":
+    Shef.connect()
+    # Shef.scrap(num_pages=10,num_recipes=200)
     main()
