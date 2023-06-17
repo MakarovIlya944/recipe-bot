@@ -43,10 +43,6 @@ def generate_html(reciep) -> str:
 <b>{reciep['name']}</b>
 
 
-<b>Описание:</b>
-{reciep['desc']}
-
-
 <b>Игредиенты:</b>
 {ings}
 
