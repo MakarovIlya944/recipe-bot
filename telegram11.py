@@ -10,23 +10,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 /help – основные команды бота
 
-/certainrecipe *название рецепта* – конкретный рецепт
-
-/ingredients *название* – укажите ингредиенты из которых хотите приготовить блюдо
-
 Идеи для готовки:
-/breakfast – завтрак
-/lunch – обед
-/saladper – ужин
-/snacks – закуски 
-/salad – салаты
-/soup – супы
-/hotmeal – горячее 
-/dessert – десерт
-/baking – выпечка
-/drinks – напитки 
-/nationalkitchen *название кухни* – национальная кухня
-/vegetarian – вегетарианская кухня
+/breakfast  - завтрак
+/lunch      - обед
+/supper     - ужин
+/snacks     - закуски
+/hotmeal    - горячее
+/salad      - салаты
+/soup       - супы
+/dessert    - десерт
+/baking     - выпечка
+/drinks     - напитки
+
+Так же если вам не понравился предложенный рецепт можно попросить другой с помощью команды
+/next
 
 Итак, что готовим? """)
     
@@ -114,7 +111,7 @@ def main():
     application.add_handler(CommandHandler("next",next))
     application.add_handler(CommandHandler("breakfast",breakfast))
     application.add_handler(CommandHandler("lunch",lunch))
-    application.add_handler(CommandHandler("salad",salad))
+    application.add_handler(CommandHandler("supper",supper))
     application.add_handler(CommandHandler("snacks",snacks))
     application.add_handler(CommandHandler("hotmeal",hotmeal))
     application.add_handler(CommandHandler("salad",salad))

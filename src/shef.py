@@ -6,7 +6,7 @@ class Shef():
   
   scrapper:Scrapper = ScrapperEdimDoma
   db:BotDatabase = None
-  lastConfig:list[str] = [0,0,0]
+  lastConfig = [0,0,0]
   
   def __init__(self, scrapper="EdimDoma") -> None:
     super().__init__()

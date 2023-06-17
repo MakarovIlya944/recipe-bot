@@ -3,7 +3,7 @@ class Scrapper():
     
     timeout_sec:float = 0.5
     base_url:str = "example.com"
-    base_words:list[str] = [
+    base_words = [
         "завтрак",
         "обед",
         "ужин",
