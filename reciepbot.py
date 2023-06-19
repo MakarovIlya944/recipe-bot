@@ -1,32 +1,66 @@
-
 from src.shef import Shef
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from telegram.ext import Application, CommandHandler, ContextTypes, CallbackQueryHandler
 
-
+keyboard = [
+    [
+        InlineKeyboardButton("завтрак", callback_data="завтрак"),
+        InlineKeyboardButton("обед", callback_data="обед"),
+        InlineKeyboardButton("ужин", callback_data="ужин")
+    ],
+    [
+        InlineKeyboardButton("закуски", callback_data="закуски"),
+        InlineKeyboardButton("горячее", callback_data="горячее"),
+        InlineKeyboardButton("салаты", callback_data="салаты")
+    ],
+    [
+        InlineKeyboardButton("супы", callback_data="супы"),
+        InlineKeyboardButton("десерт", callback_data="десерт"),
+        InlineKeyboardButton("выпечка", callback_data="выпечка")
+    ],
+    [
+        InlineKeyboardButton("напитки", callback_data="напитки"),
+    ],
+]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global keyboard
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
     await update.message.reply_text("""Ты можешь управлять мной используя следующие команды:
 
 /help – основные команды бота
 
-Идеи для готовки:
-/breakfast  - завтрак
-/lunch      - обед
-/supper     - ужин
-/snacks     - закуски
-/hotmeal    - горячее
-/salad      - салаты
-/soup       - супы
-/dessert    - десерт
-/baking     - выпечка
-/drinks     - напитки
+Идеи для готовки можете выбарть по клавишам
 
 Так же если вам не понравился предложенный рецепт можно попросить другой с помощью команды
 /next
 
-Итак, что готовим? """)
+Итак, что готовим? """, reply_markup=reply_markup)
+
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Parses the CallbackQuery and updates the message text."""
+    query:CallbackQuery = update.callback_query
+    await query.answer()
     
+    if query.data == "start":
+        global keyboard
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_reply_markup(reply_markup=reply_markup)
+    else:
+        keyboard_reciep = [
+            [
+                InlineKeyboardButton("другой рецепт", callback_data="start"),
+                InlineKeyboardButton("следующий рецепт", callback_data="next"),
+            ],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard_reciep)
+        if query.data == 'next':
+            r = Shef.next()
+        else:
+            r = Shef.get(query.data)
+        await query.message.reply_html(generate_html(r),reply_markup=reply_markup)
+
 def generate_html(reciep) -> str:
     ings = []
     for i in reciep['ingredients']:
@@ -42,84 +76,26 @@ def generate_html(reciep) -> str:
     return f"""
 <b>{reciep['name']}</b>
 
-
 <b>Игредиенты:</b>
 {ings}
 
-
 <b>Приготовление:</b>
-{steps}
-                                    """
-
-async def breakfast(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("завтрак")
-    await update.message.reply_html(generate_html(Shef.get("завтрак")))
-
-async def lunch(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("обед")
-    await update.message.reply_html(generate_html(Shef.get("обед")))
-
-async def supper(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("ужин")
-    await update.message.reply_html(generate_html(Shef.get("ужин")))
-
-async def salad(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("салат")
-    await update.message.reply_html(generate_html(Shef.get("салат")))
-
-async def snacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("закуска")
-    await update.message.reply_html(generate_html(Shef.get("закуска")))
-
-async def soup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("суп")
-    await update.message.reply_html(generate_html(Shef.get("суп")))
-
-async def hotmeal(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("горячее")
-    await update.message.reply_html(generate_html(Shef.get("горячее")))
-
-async def dessert(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("десерт")
-    await update.message.reply_html(generate_html(Shef.get("десерт")))
-
-async def baking(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("выпечка")
-    await update.message.reply_html(generate_html(Shef.get("выпечка")))
-
-async def drinks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("напитки")
-    await update.message.reply_html(generate_html(Shef.get("напитки")))
-    
-# async def vegetarian(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     print("завтрак")
-#     await update.message.reply_html(generate_html("завтрак"))
+{steps}"""
 
 async def next(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print("next")
-    Shef.next()
     await update.message.reply_html(generate_html(Shef.next()))
 
 def main():
-    print("привет")
+    print("hello")
     application = Application.builder().token("").build()
     application.add_handler(CommandHandler(["start", "help"], start))
     application.add_handler(CommandHandler("next",next))
-    application.add_handler(CommandHandler("breakfast",breakfast))
-    application.add_handler(CommandHandler("lunch",lunch))
-    application.add_handler(CommandHandler("supper",supper))
-    application.add_handler(CommandHandler("snacks",snacks))
-    application.add_handler(CommandHandler("hotmeal",hotmeal))
-    application.add_handler(CommandHandler("salad",salad))
-    application.add_handler(CommandHandler("soup",soup))
-    application.add_handler(CommandHandler("dessert",dessert))
-    application.add_handler(CommandHandler("baking",baking))
-    application.add_handler(CommandHandler("drinks",drinks))
+    application.add_handler(CallbackQueryHandler(button))
     
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
 
-"""разбить хэндлеры на отдельные, описать старт  хелп некст"""
 if __name__ =="__main__":
     Shef.connect()
     # Shef.scrap(num_pages=10,num_recipes=200)
