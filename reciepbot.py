@@ -23,6 +23,8 @@ keyboard = [
     ],
 ]
 
+TOKEN=""
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global keyboard
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -88,7 +90,7 @@ async def next(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 def main():
     print("hello")
-    application = Application.builder().token("").build()
+    application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler(["start", "help"], start))
     application.add_handler(CommandHandler("next",next))
     application.add_handler(CallbackQueryHandler(button))

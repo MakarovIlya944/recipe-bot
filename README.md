@@ -1,5 +1,5 @@
 # icqbot
-Recipe bot for icqnew
+Recipe bot for telegram
 
 # Init program
 
@@ -9,8 +9,6 @@ Recipe bot for icqnew
 ```sh
 python -m venv venv  
 ```
-* Закрываем консоль на корзинку  
-* Открываем консоль Ctrl+Shift+~  
 * Устанавливаем сторонние библиотеки
 ```sh
 pip install -r req.txt
@@ -19,7 +17,7 @@ pip install -r req.txt
 # Парсить рецепты
 
 ```sh
-python ./shef.py
+python ./scrap.py
 ```
 
 # Запустить бота
@@ -30,7 +28,7 @@ TOKEN = ""
 ```
 
 ```sh
-python ./main.py
+python ./recipebot.py
 ```
 
 # Остановить бота
