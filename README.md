@@ -1,4 +1,4 @@
-# icqbot
+# Recipe bot
 Recipe bot for telegram
 
 # Init program
