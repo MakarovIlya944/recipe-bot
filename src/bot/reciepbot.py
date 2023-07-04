@@ -1,4 +1,4 @@
-from src.shef import Shef
+from shef import Shef
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from telegram.ext import Application, CommandHandler, ContextTypes, CallbackQueryHandler
 
@@ -22,8 +22,6 @@ keyboard = [
         InlineKeyboardButton("напитки", callback_data="напитки"),
     ],
 ]
-
-TOKEN=""
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global keyboard
@@ -90,7 +88,7 @@ async def next(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 def main():
     print("hello")
-    application = Application.builder().token(TOKEN).build()
+    application = Application.builder().token("").build()
     application.add_handler(CommandHandler(["start", "help"], start))
     application.add_handler(CommandHandler("next",next))
     application.add_handler(CallbackQueryHandler(button))

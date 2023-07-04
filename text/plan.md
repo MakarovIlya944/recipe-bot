@@ -1,6 +1,5 @@
-
-
 bot
+
 - control plane
 - get random idea
 - get kitchen idea
@@ -9,6 +8,7 @@ bot
 - visualize buttons
 
 shef
+
 - scrap reciepts
 - save reciepts
 - set tags
